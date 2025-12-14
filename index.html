@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CORS Demo with Image Fetch</title>
+</head>
+<body style="text-align:center; font-family:Arial, sans-serif; margin-top:40px;">
+  <h2>🧠 CORS Demo with Image (via Fetch)</h2>
+  <p>Click the button below to fetch an image from another S3 bucket.</p>
+  <button id="fetchBtn" style="padding:10px 20px; font-size:16px;">Fetch Image</button>
+  <p id="status" style="color:gray;"></p>
+  <div id="imageContainer" style="margin-top:20px;"></div>
+
+  <script>
+    const fetchBtn = document.getElementById('fetchBtn');
+    const status = document.getElementById('status');
+    const imageContainer = document.getElementById('imageContainer');
+
+    fetchBtn.addEventListener('click', async () => {
+      status.textContent = "Fetching image...";
+      imageContainer.innerHTML = "";
+
+      try {
+        // 👇 Replace with your Bucket A object URL
+        const imageUrl ="https://image-bukket-10.s3.ap-south-1.amazonaws.com/images.jpeg";
+
+        // Fetch the image as a binary blob (this triggers CORS check!)
+        const response = await fetch(imageUrl);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(blob);
+        img.alt = "Fetched Image via Fetch API";
+        img.style = "max-width:400px; margin-top:20px; border:2px solid #ddd; border-radius:10px;";
+        imageContainer.appendChild(img);
+
+        status.textContent = "✅ Image fetched successfully!";
+      } catch (error) {
+        console.error(error);
+        status.textContent = "🚫 CORS blocked the request or image not accessible!";
+      }
+    });
+  </script>
+</body>
+</html>
